@@ -9,6 +9,7 @@ import {
   removeStoredMedia,
   uploadDataUrl
 } from "../storage.js";
+import { applyShowcaseMediaFallback, isShowcaseAccount } from "../showcaseMedia.js";
 
 const router = express.Router();
 router.use(requireAuth);
@@ -28,7 +29,8 @@ router.get("/trips/:tripId/missions", async (req, res) => {
   const data = await readData();
   const trip = data.trips.find((item) => item.id === req.params.tripId && item.userId === req.auth.user.id);
   if (!trip) return res.status(404).json({ error: "Viaje no encontrado." });
-  const missions = await hydrateMissionsMedia(data.missions.filter((mission) => mission.tripId === trip.id));
+  const hydratedMissions = await hydrateMissionsMedia(data.missions.filter((mission) => mission.tripId === trip.id));
+  const missions = applyShowcaseMediaFallback(hydratedMissions, isShowcaseAccount(req.auth));
   return res.json({ missions });
 });
 
