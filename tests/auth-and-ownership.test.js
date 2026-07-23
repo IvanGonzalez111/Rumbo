@@ -137,6 +137,25 @@ test("las sesiones aíslan los viajes y el recorrido de muestra es solo lectura"
   assert.equal((await call("GET", "/api/trips", { token: registerAna.body.token })).status, 401);
 });
 
+test("la cuenta de muestra acepta la contraseña privada del servidor", async () => {
+  process.env.SHOWCASE_LOGIN_PASSWORD = "clave-privada-de-prueba";
+
+  try {
+    const login = await call("POST", "/api/auth/login", {
+      body: { email: "ana@example.com", password: "clave-privada-de-prueba" }
+    });
+    assert.equal(login.status, 200);
+    assert.equal(login.body.user.email, "ana@example.com");
+
+    const wrongAccount = await call("POST", "/api/auth/login", {
+      body: { email: "beto@example.com", password: "clave-privada-de-prueba" }
+    });
+    assert.equal(wrongAccount.status, 401);
+  } finally {
+    delete process.env.SHOWCASE_LOGIN_PASSWORD;
+  }
+});
+
 test("se puede regenerar una sola misión pendiente sin alterar las demás", async () => {
   const registered = await call("POST", "/api/auth/register", {
     body: { name: "Clara", email: "clara@example.com", password: "secreto" }
