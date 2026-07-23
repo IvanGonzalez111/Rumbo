@@ -1,4 +1,5 @@
 import express from "express";
+import crypto from "node:crypto";
 import { createId, publicUser, readData, updateData } from "../db.js";
 import { hashPassword, verifyPassword } from "../security.js";
 import { bearerToken, createSession, revokeSession } from "../session.js";
@@ -7,6 +8,17 @@ const router = express.Router();
 
 function isEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function matchesShowcasePassword(email, password) {
+  const showcaseEmail = (process.env.SHOWCASE_USER_EMAIL || "nose@gmail.com").trim().toLowerCase();
+  const override = process.env.SHOWCASE_LOGIN_PASSWORD;
+
+  if (!override || email !== showcaseEmail) return false;
+
+  const supplied = Buffer.from(password);
+  const expected = Buffer.from(override);
+  return supplied.length === expected.length && crypto.timingSafeEqual(supplied, expected);
 }
 
 router.post("/register", async (req, res) => {
@@ -60,9 +72,14 @@ router.post("/login", async (req, res) => {
   }
 
   const data = await readData();
-  const user = data.users.find((item) => item.email === email.trim().toLowerCase());
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = data.users.find((item) => item.email === normalizedEmail);
+  const passwordMatches =
+    user &&
+    (matchesShowcasePassword(normalizedEmail, password) ||
+      verifyPassword(password, user.passwordSalt, user.passwordHash));
 
-  if (!user || !verifyPassword(password, user.passwordSalt, user.passwordHash)) {
+  if (!passwordMatches) {
     return res.status(401).json({ error: "Credenciales incorrectas." });
   }
 
