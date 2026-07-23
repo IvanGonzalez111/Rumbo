@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { applyShowcaseMediaFallback } from "../server/showcaseMedia.js";
+import { applyShowcaseMediaFallback, isShowcaseAccount } from "../server/showcaseMedia.js";
 
 const showcaseMissionId = "mis_a266d4cd-1368-4a79-b5d4-e8dc7b3398ce";
 
@@ -50,4 +50,10 @@ test("does not change regular accounts or unrelated missions", () => {
   const missions = [{ id: showcaseMissionId, mediaType: "image" }, { id: "mis_other", mediaType: "image" }];
   assert.deepEqual(applyShowcaseMediaFallback(missions, false), missions);
   assert.deepEqual(applyShowcaseMediaFallback([missions[1]], true), [missions[1]]);
+});
+
+test("recognizes existing read-only showcase sessions", () => {
+  assert.equal(isShowcaseAccount({ session: { readOnly: true }, user: {} }), true);
+  assert.equal(isShowcaseAccount({ session: {}, user: { readOnly: true } }), true);
+  assert.equal(isShowcaseAccount({ session: {}, user: { email: "regular@test.com" } }), false);
 });
