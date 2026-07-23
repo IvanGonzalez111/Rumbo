@@ -32,6 +32,20 @@ test("keeps a video uploaded by the user instead of replacing it", () => {
   assert.deepEqual(mission, original);
 });
 
+test("restores showcase media by title when sanitized data has a different id", () => {
+  const [mission] = applyShowcaseMediaFallback([
+    {
+      id: "mis_sanitized",
+      title: "Sonido del Mar",
+      mediaType: "image",
+      mediaDataUrl: "data:image/jpeg;base64,poster"
+    }
+  ], true);
+
+  assert.equal(mission.mediaType, "video");
+  assert.equal(mission.mediaDataUrl, "/assets/showcase/sonido-del-mar.mp4");
+});
+
 test("does not change regular accounts or unrelated missions", () => {
   const missions = [{ id: showcaseMissionId, mediaType: "image" }, { id: "mis_other", mediaType: "image" }];
   assert.deepEqual(applyShowcaseMediaFallback(missions, false), missions);
