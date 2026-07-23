@@ -1,6 +1,7 @@
 import express from "express";
 import { createId, readData, updateData } from "../db.js";
 import { requireAuth, requireWritable } from "../authMiddleware.js";
+import { applyShowcaseMediaFallback, isShowcaseAccount } from "../showcaseMedia.js";
 import { hydrateMissionsMedia, missionStoragePaths, removeStoredMedia } from "../storage.js";
 
 const router = express.Router();
@@ -128,7 +129,8 @@ router.get("/:tripId", async (req, res) => {
     return res.status(404).json({ error: "Viaje no encontrado." });
   }
 
-  const missions = await hydrateMissionsMedia(data.missions.filter((mission) => mission.tripId === trip.id));
+  const hydratedMissions = await hydrateMissionsMedia(data.missions.filter((mission) => mission.tripId === trip.id));
+  const missions = applyShowcaseMediaFallback(hydratedMissions, isShowcaseAccount(req.auth));
   return res.json({
     trip,
     missions,
