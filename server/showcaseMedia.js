@@ -22,7 +22,13 @@ const showcaseMediaByMissionTitle = new Map([
 
 export function isShowcaseAccount(auth) {
   const showcaseEmail = (process.env.SHOWCASE_USER_EMAIL || "nose@gmail.com").trim().toLowerCase();
-  return Boolean(auth?.session?.showcase || auth?.user?.email === showcaseEmail);
+  return Boolean(
+    auth?.session?.showcase
+    || auth?.session?.readOnly
+    || auth?.user?.showcase
+    || auth?.user?.readOnly
+    || auth?.user?.email === showcaseEmail
+  );
 }
 
 export function applyShowcaseMediaFallback(missions, enabled = false) {
