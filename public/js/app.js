@@ -438,7 +438,7 @@ function renderMissionEvidence(mission, alt) {
   if (missionMediaType(mission) === "video") {
     const savedPoster = missionPosterDataUrl(mission);
     const poster = savedPoster || videoFallbackPoster();
-    return `<video src="${escapeHtml(dataUrl)}" poster="${escapeHtml(poster)}" controls playsinline preload="auto" data-video-preview data-fallback-poster="${savedPoster ? "false" : "true"}" aria-label="${escapeHtml(alt)}"></video>`;
+    return `<video src="${escapeHtml(dataUrl)}" poster="${escapeHtml(poster)}" controls playsinline preload="metadata" data-video-preview data-fallback-poster="${savedPoster ? "false" : "true"}" aria-label="${escapeHtml(alt)}"></video>`;
   }
 
   return `<img src="${escapeHtml(dataUrl)}" alt="${escapeHtml(alt)}" style="${missionMediaPositionStyle(mission)}" />`;
