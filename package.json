@@ -8,6 +8,7 @@
     "start": "node server/index.js",
     "dev": "node --watch-path=server --watch-path=public server/index.js",
     "migrate:supabase": "node scripts/migrate-json-to-supabase.js",
+    "reset-password": "node scripts/reset-password.js",
     "test": "node --test"
   },
   "dependencies": {

@@ -51,6 +51,24 @@ La cuenta que abre `Ver recorrido de muestra` se configura con
 `SHOWCASE_USER_EMAIL`. El visitante puede recorrer viajes, misiones, sellos y
 bitacoras, pero no crear, editar ni eliminar contenido desde esa vista.
 
+### Restablecer una contraseña local
+
+Para cambiar la contraseña de una cuenta sin borrar sus viajes:
+
+```bash
+npm run reset-password -- --email nose@gmail.com
+```
+
+El comando solicita y confirma la nueva contraseña sin mostrarla, crea una copia
+de seguridad del JSON e invalida las sesiones anteriores de esa cuenta. Este
+cambio afecta el archivo local; antes de publicar datos reales debe configurarse
+Supabase y migrar la información para que sobreviva a futuros despliegues.
+
+En Render, la cuenta de muestra puede usar una contraseña privada sin publicar
+su hash ni reemplazar el archivo de recuerdos. Configurá `SHOWCASE_USER_EMAIL` y
+`SHOWCASE_LOGIN_PASSWORD` en **Environment**. La segunda variable debe cargarse
+directamente en Render y nunca copiarse al repositorio ni compartirse por chat.
+
 ## Persistencia al publicar
 
 Sin variables de Supabase, la app usa `data/rumbo.json` para desarrollo local.
